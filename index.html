@@ -1,0 +1,3980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FacultyFlow | Faculty Management System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    color:#1e293b;
+}
+
+button{
+    cursor:pointer;
+    border:none;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* LOGIN */
+.login-page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#4338ca,#6366f1,#8b5cf6);
+    padding:20px;
+}
+
+.login-box{
+    width:420px;
+    max-width:100%;
+    background:white;
+    padding:35px;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.logo h1{
+    color:#4338ca;
+    font-size:30px;
+}
+
+.logo p{
+    color:#64748b;
+    margin-top:6px;
+}
+
+.login-tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:22px;
+}
+
+.login-tabs button{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    background:#eef2ff;
+    color:#4338ca;
+    font-weight:bold;
+}
+
+.login-tabs button.active{
+    background:#4338ca;
+    color:white;
+}
+
+.form-group{
+    margin-bottom:16px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:7px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #dbe2ea;
+    border-radius:9px;
+    outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color:#6366f1;
+}
+
+.login-btn{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    background:#4338ca;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.login-error{
+    color:#dc2626;
+    text-align:center;
+    margin-top:12px;
+    font-size:14px;
+}
+
+/* APP */
+.app{
+    min-height:100vh;
+}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:250px;
+    height:100vh;
+    background:#111827;
+    color:white;
+    padding:20px 15px;
+    z-index:100;
+    transition:.3s;
+}
+
+.sidebar-logo{
+    padding:10px;
+    margin-bottom:25px;
+}
+
+.sidebar-logo h2{
+    color:white;
+}
+
+.sidebar-logo span{
+    color:#818cf8;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px;
+    border-radius:9px;
+    color:#cbd5e1;
+    margin-bottom:6px;
+    cursor:pointer;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:#4338ca;
+    color:white;
+}
+
+.main{
+    margin-left:250px;
+    min-height:100vh;
+}
+
+.topbar{
+    height:70px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.menu-btn{
+    display:none;
+    background:#eef2ff;
+    padding:8px 12px;
+    border-radius:8px;
+}
+
+.user-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.user-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#4338ca;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.logout-btn{
+    background:#fee2e2;
+    color:#dc2626;
+    padding:9px 13px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.content{
+    padding:25px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.page-title{
+    margin-bottom:20px;
+}
+
+.page-title h1{
+    font-size:27px;
+}
+
+.page-title p{
+    color:#64748b;
+    margin-top:5px;
+}
+
+/* CARDS */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:22px;
+    box-shadow:0 4px 15px rgba(15,23,42,.06);
+}
+
+.card-label{
+    color:#64748b;
+    font-size:14px;
+}
+
+.card-value{
+    font-size:30px;
+    font-weight:bold;
+    margin-top:8px;
+    color:#1e293b;
+}
+
+.card-icon{
+    font-size:28px;
+    margin-bottom:8px;
+}
+
+/* TABLE */
+.table-box{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 4px 15px rgba(15,23,42,.06);
+    overflow-x:auto;
+}
+
+.table-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+    gap:10px;
+}
+
+.table-header h2{
+    font-size:20px;
+}
+
+.primary-btn{
+    background:#4338ca;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.secondary-btn{
+    background:#e0e7ff;
+    color:#3730a3;
+    padding:10px 15px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.danger-btn{
+    background:#fee2e2;
+    color:#dc2626;
+    padding:7px 10px;
+    border-radius:7px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:700px;
+}
+
+th{
+    background:#f8fafc;
+    text-align:left;
+    padding:12px;
+    color:#475569;
+    font-size:13px;
+}
+
+td{
+    padding:13px 12px;
+    border-top:1px solid #eef2f7;
+    font-size:14px;
+}
+
+/* BADGES */
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge-green{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.badge-red{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.badge-yellow{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.badge-blue{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.badge-purple{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+/* ATTENDANCE */
+.attendance-controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.attendance-controls input{
+    padding:10px;
+    border:1px solid #dbe2ea;
+    border-radius:8px;
+}
+
+.attendance-buttons{
+    display:flex;
+    gap:6px;
+}
+
+.present-btn,
+.absent-btn{
+    padding:7px 10px;
+    border-radius:7px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.present-btn{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.present-btn.selected{
+    background:#16a34a;
+    color:white;
+}
+
+.absent-btn{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.absent-btn.selected{
+    background:#dc2626;
+    color:white;
+}
+
+/* TASK STATUS */
+.status-buttons{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+}
+
+.status-btn{
+    padding:6px 9px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.status-pending{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.status-progress{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.status-completed{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:300;
+    padding:20px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:550px;
+    max-width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    background:white;
+    border-radius:16px;
+    padding:25px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.close-btn{
+    background:#f1f5f9;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    font-size:18px;
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+/* WORKLOAD */
+.workload-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.workload-card{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+}
+
+.progress{
+    width:100%;
+    height:9px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:12px;
+}
+
+.progress-bar{
+    height:100%;
+    background:#6366f1;
+}
+
+/* PROFILE */
+.profile-box{
+    max-width:700px;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+}
+
+.profile-row{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:15px;
+    padding:13px 0;
+    border-bottom:1px solid #eef2f7;
+}
+
+.profile-row strong{
+    color:#64748b;
+}
+
+/* EMPTY */
+.empty{
+    text-align:center;
+    padding:35px;
+    color:#64748b;
+}
+
+/* LOADING */
+.loading{
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,.9);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:500;
+}
+
+.loading.show{
+    display:flex;
+}
+
+.loading-box{
+    text-align:center;
+}
+
+.spinner{
+    width:42px;
+    height:42px;
+    border:4px solid #e5e7eb;
+    border-top-color:#4338ca;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin:auto auto 12px;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+/* MOBILE */
+@media(max-width:900px){
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .workload-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:700px){
+    .sidebar{
+        transform:translateX(-100%);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .menu-btn{
+        display:block;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .workload-grid{
+        grid-template-columns:1fr;
+    }
+
+    .content{
+        padding:15px;
+    }
+
+    .topbar{
+        padding:0 15px;
+    }
+
+    .user-area span{
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-box">
+
+        <div class="logo">
+            <h1>FacultyFlow</h1>
+            <p>Faculty Management System</p>
+        </div>
+
+        <div class="login-tabs">
+
+            <button id="hodTab"
+                    class="active"
+                    onclick="selectLoginType('hod')">
+                HOD / Admin
+            </button>
+
+            <button id="facultyTab"
+                    onclick="selectLoginType('faculty')">
+                Faculty
+            </button>
+
+        </div>
+
+        <div class="form-group">
+            <label id="loginIdLabel">Username</label>
+            <input id="loginId"
+                   type="text"
+                   placeholder="Enter username">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input id="loginPassword"
+                   type="password"
+                   placeholder="Enter password">
+        </div>
+
+        <button class="login-btn" onclick="login()">
+            Login
+        </button>
+
+        <div id="loginError" class="login-error"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= APP ================= -->
+
+<div id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div class="sidebar-logo">
+            <h2>Faculty<span>Flow</span></h2>
+            <small>Management System</small>
+        </div>
+
+        <!-- HOD NAV -->
+
+        <div id="hodNav">
+
+            <div class="nav-item active"
+                 onclick="showPage('dashboard',this)">
+                📊 Dashboard
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('faculty',this)">
+                👨‍🏫 Faculty Management
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('attendance',this)">
+                📅 Attendance
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('work',this)">
+                📋 Work Assignment
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('workload',this)">
+                📈 Workload Report
+            </div>
+
+        </div>
+
+        <!-- FACULTY NAV -->
+
+        <div id="facultyNav" class="hidden">
+
+            <div class="nav-item active"
+                 onclick="showPage('myDashboard',this)">
+                📊 My Dashboard
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('myAttendance',this)">
+                📅 My Attendance
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('myWork',this)">
+                📋 My Work
+            </div>
+
+            <div class="nav-item"
+                 onclick="showPage('profile',this)">
+                👤 My Profile
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <button class="menu-btn"
+                    onclick="toggleSidebar()">
+                ☰
+            </button>
+
+            <div>
+                <strong id="topTitle">Dashboard</strong>
+            </div>
+
+            <div class="user-area">
+
+                <div class="user-avatar"
+                     id="userAvatar">
+                    A
+                </div>
+
+                <span id="userName">Admin</span>
+
+                <button class="logout-btn"
+                        onclick="logout()">
+                    Logout
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+
+            <!-- ================= DASHBOARD ================= -->
+
+            <div id="dashboard" class="page active">
+
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Faculty management overview</p>
+                </div>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <div class="card-icon">👨‍🏫</div>
+                        <div class="card-label">Total Faculty</div>
+                        <div id="totalFaculty"
+                             class="card-value">0</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">✅</div>
+                        <div class="card-label">Present Today</div>
+                        <div id="presentToday"
+                             class="card-value">0</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">❌</div>
+                        <div class="card-label">Absent Today</div>
+                        <div id="absentToday"
+                             class="card-value">0</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">📋</div>
+                        <div class="card-label">Active Tasks</div>
+                        <div id="activeTasks"
+                             class="card-value">0</div>
+                    </div>
+
+                </div>
+
+
+                <div class="table-box">
+
+                    <div class="table-header">
+                        <h2>Recent Work Assignments</h2>
+                    </div>
+
+                    <div id="dashboardTasks"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= FACULTY MANAGEMENT ================= -->
+
+            <div id="faculty" class="page">
+
+                <div class="page-title">
+                    <h1>Faculty Management</h1>
+                    <p>Add, manage and import faculty information</p>
+                </div>
+
+                <div class="table-box">
+
+                    <div class="table-header">
+
+                        <h2>Faculty List</h2>
+
+                        <div>
+                            <button class="secondary-btn"
+                                    onclick="document.getElementById('csvFile').click()">
+                                📥 Import CSV
+                            </button>
+
+                            <input id="csvFile"
+                                   type="file"
+                                   accept=".csv"
+                                   style="display:none"
+                                   onchange="importFacultyData(event)">
+
+                            <button class="primary-btn"
+                                    onclick="openFacultyModal()">
+                                + Add Faculty
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div id="facultyTable"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= ATTENDANCE ================= -->
+
+            <div id="attendance" class="page">
+
+                <div class="page-title">
+                    <h1>Attendance Management</h1>
+                    <p>Mark faculty attendance</p>
+                </div>
+
+                <div class="attendance-controls">
+
+                    <label><strong>Date:</strong></label>
+
+                    <input id="attendanceDate"
+                           type="date"
+                           onchange="renderAttendance()">
+
+                    <button class="primary-btn"
+                            onclick="markAllPresent()">
+                        ✓ Mark All Present
+                    </button>
+
+                </div>
+
+                <div class="table-box">
+
+                    <div id="attendanceTable"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= WORK ================= -->
+
+            <div id="work" class="page">
+
+                <div class="page-title">
+                    <h1>Work Assignment</h1>
+                    <p>Assign and track faculty work</p>
+                </div>
+
+                <div class="table-box">
+
+                    <div class="table-header">
+
+                        <h2>Work Assignments</h2>
+
+                        <button class="primary-btn"
+                                onclick="openTaskModal()">
+                            + Assign Work
+                        </button>
+
+                    </div>
+
+                    <div id="taskTable"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= WORKLOAD ================= -->
+
+            <div id="workload" class="page">
+
+                <div class="page-title">
+                    <h1>Workload Report</h1>
+                    <p>Faculty task distribution</p>
+                </div>
+
+                <div id="workloadGrid"
+                     class="workload-grid"></div>
+
+            </div>
+
+
+            <!-- ================= FACULTY DASHBOARD ================= -->
+
+            <div id="myDashboard" class="page">
+
+                <div class="page-title">
+                    <h1>My Dashboard</h1>
+                    <p>Your faculty overview</p>
+                </div>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <div class="card-icon">📅</div>
+                        <div class="card-label">Attendance</div>
+                        <div id="myAttendanceValue"
+                             class="card-value">0%</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">📋</div>
+                        <div class="card-label">Total Tasks</div>
+                        <div id="myTotalTasks"
+                             class="card-value">0</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">⏳</div>
+                        <div class="card-label">Pending Tasks</div>
+                        <div id="myPendingTasks"
+                             class="card-value">0</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">✅</div>
+                        <div class="card-label">Completed</div>
+                        <div id="myCompletedTasks"
+                             class="card-value">0</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MY ATTENDANCE ================= -->
+
+            <div id="myAttendance" class="page">
+
+                <div class="page-title">
+                    <h1>My Attendance</h1>
+                    <p>Attendance history</p>
+                </div>
+
+                <div class="table-box">
+
+                    <div id="myAttendanceTable"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MY WORK ================= -->
+
+            <div id="myWork" class="page">
+
+                <div class="page-title">
+                    <h1>My Work</h1>
+                    <p>Assigned tasks and their status</p>
+                </div>
+
+                <div class="table-box">
+
+                    <div id="myWorkTable"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= PROFILE ================= -->
+
+            <div id="profile" class="page">
+
+                <div class="page-title">
+                    <h1>My Profile</h1>
+                    <p>Faculty information</p>
+                </div>
+
+                <div id="profileBox"
+                     class="profile-box"></div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= FACULTY MODAL ================= -->
+
+<div id="facultyModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Add Faculty</h2>
+
+            <button class="close-btn"
+                    onclick="closeModal('facultyModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="form-group">
+            <label>Faculty ID</label>
+            <input id="facultyId"
+                   placeholder="Example: FAC013">
+        </div>
+
+        <div class="form-group">
+            <label>Name</label>
+            <input id="facultyName"
+                   placeholder="Faculty name">
+        </div>
+
+        <div class="form-group">
+            <label>Department</label>
+            <select id="facultyDepartment">
+                <option>CSE</option>
+                <option>ECE</option>
+                <option>EEE</option>
+                <option>IT</option>
+                <option>MECH</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Designation</label>
+            <select id="facultyDesignation">
+                <option>Professor</option>
+                <option>Associate Professor</option>
+                <option>Assistant Professor</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Experience</label>
+            <input id="facultyExperience"
+                   type="number"
+                   min="0"
+                   placeholder="Years">
+        </div>
+
+        <div class="modal-footer">
+
+            <button class="secondary-btn"
+                    onclick="closeModal('facultyModal')">
+                Cancel
+            </button>
+
+            <button class="primary-btn"
+                    onclick="addFaculty()">
+                Save Faculty
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TASK MODAL ================= -->
+
+<div id="taskModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Assign Work</h2>
+
+            <button class="close-btn"
+                    onclick="closeModal('taskModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="form-group">
+            <label>Faculty</label>
+
+            <select id="taskFaculty"></select>
+        </div>
+
+        <div class="form-group">
+            <label>Work Title</label>
+
+            <input id="taskTitle"
+                   placeholder="Example: Prepare Internal Exam Question Paper">
+        </div>
+
+        <div class="form-group">
+            <label>Category</label>
+
+            <select id="taskCategory">
+
+                <option>Examination</option>
+                <option>Documentation</option>
+                <option>Lab</option>
+                <option>Administration</option>
+                <option>Event</option>
+                <option>Academic</option>
+                <option>Other</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+            <label>Priority</label>
+
+            <select id="taskPriority">
+
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+            <label>Due Date</label>
+
+            <input id="taskDueDate"
+                   type="date">
+        </div>
+
+        <div class="form-group">
+            <label>Instructions</label>
+
+            <textarea id="taskInstructions"
+                      rows="4"
+                      placeholder="Enter work instructions"></textarea>
+        </div>
+
+        <div class="form-group">
+
+            <label>Initial Status</label>
+
+            <div class="status-buttons">
+
+                <button id="newStatusPending"
+                        class="status-btn status-pending"
+                        onclick="selectNewTaskStatus('Pending')">
+                    Pending
+                </button>
+
+                <button id="newStatusProgress"
+                        class="status-btn status-progress"
+                        onclick="selectNewTaskStatus('In Progress')">
+                    In Progress
+                </button>
+
+                <button id="newStatusCompleted"
+                        class="status-btn status-completed"
+                        onclick="selectNewTaskStatus('Completed')">
+                    Completed
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button class="secondary-btn"
+                    onclick="closeModal('taskModal')">
+                Cancel
+            </button>
+
+            <button class="primary-btn"
+                    onclick="addTask()">
+                Assign Work
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- LOADING -->
+
+<div id="loading" class="loading">
+
+    <div class="loading-box">
+
+        <div class="spinner"></div>
+
+        <strong>Loading FacultyFlow...</strong>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE CONFIGURATION
+========================================================= */
+
+const SUPABASE_URL =
+"https://jmbzpunmhmrsfyubagrx.supabase.co";
+
+/*
+   IMPORTANT:
+   Paste your Supabase PUBLISHABLE KEY below.
+   Do NOT use secret/service-role key.
+*/
+
+const SUPABASE_KEY =
+"sb_publishable_2_rLw1tNEQVHYYfxnp4yFw_mGuxMrJ1";
+
+const supabaseClient =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================================================
+   APP DATA
+========================================================= */
+
+let facultyData = [];
+
+let tasks = [];
+
+let attendanceData = {};
+
+let currentUser = null;
+
+let loginType = "hod";
+
+let newTaskStatus = "Pending";
+
+let dataReady = false;
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function showLoading(){
+    document.getElementById("loading").classList.add("show");
+}
+
+function hideLoading(){
+    document.getElementById("loading").classList.remove("show");
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function getToday(){
+
+    const d = new Date();
+
+    const year = d.getFullYear();
+
+    const month =
+        String(d.getMonth()+1).padStart(2,"0");
+
+    const day =
+        String(d.getDate()).padStart(2,"0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+/* =========================================================
+   LOGIN TYPE
+========================================================= */
+
+function selectLoginType(type){
+
+    loginType = type;
+
+    const hodTab =
+        document.getElementById("hodTab");
+
+    const facultyTab =
+        document.getElementById("facultyTab");
+
+    const label =
+        document.getElementById("loginIdLabel");
+
+    const input =
+        document.getElementById("loginId");
+
+    hodTab.classList.remove("active");
+    facultyTab.classList.remove("active");
+
+    if(type === "hod"){
+
+        hodTab.classList.add("active");
+
+        label.textContent = "Username";
+
+        input.placeholder = "Enter username";
+
+    }else{
+
+        facultyTab.classList.add("active");
+
+        label.textContent = "Faculty ID";
+
+        input.placeholder = "Example: FAC001";
+
+    }
+
+    document.getElementById("loginError").textContent = "";
+
+}
+
+
+/* =========================================================
+   SUPABASE LOAD
+========================================================= */
+
+async function loadDataFromSupabase(){
+
+    showLoading();
+
+    try{
+
+        /* FACULTY */
+
+        const {
+            data: facultyRows,
+            error: facultyError
+        } =
+        await supabaseClient
+            .from("faculty")
+            .select("*")
+            .order("id",{ascending:true});
+
+        if(facultyError)
+            throw facultyError;
+
+
+        facultyData =
+            (facultyRows || []).map(row => ({
+
+                id: row.faculty_id,
+
+                name: row.name,
+
+                department: row.department,
+
+                designation: row.designation,
+
+                experience:
+                    Number(row.experience || 0),
+
+                attendance:
+                    Number(row.attendance || 0)
+
+            }));
+
+
+        /* WORK ASSIGNMENTS */
+
+        const {
+            data: taskRows,
+            error: taskError
+        } =
+        await supabaseClient
+            .from("work_assignments")
+            .select("*")
+            .order("id",{ascending:true});
+
+        if(taskError)
+            throw taskError;
+
+
+        tasks =
+            (taskRows || []).map(row => ({
+
+                id: row.id,
+
+                facultyId: row.faculty_id,
+
+                title: row.title,
+
+                category: row.category,
+
+                priority: row.priority,
+
+                dueDate: row.due_date,
+
+                instructions:
+                    row.instructions || "",
+
+                status: row.status
+
+            }));
+
+
+        /* ATTENDANCE */
+
+        const {
+            data: attendanceRows,
+            error: attendanceError
+        } =
+        await supabaseClient
+            .from("attendance")
+            .select("*")
+            .order("attendance_date",{ascending:true});
+
+        if(attendanceError)
+            throw attendanceError;
+
+
+        attendanceData = {};
+
+
+        (attendanceRows || []).forEach(row => {
+
+            if(!attendanceData[row.attendance_date]){
+
+                attendanceData[row.attendance_date] = {};
+
+            }
+
+            attendanceData[
+                row.attendance_date
+            ][row.faculty_id] = row.status;
+
+        });
+
+
+        dataReady = true;
+
+        renderAll();
+
+        hideLoading();
+
+        return true;
+
+    }catch(error){
+
+        console.error(
+            "Supabase Error:",
+            error
+        );
+
+        hideLoading();
+
+        dataReady = false;
+
+        alert(
+            "Supabase connection error.\n\n" +
+            "Check Project URL, Publishable Key, " +
+            "RLS policies and table names."
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(){
+
+    const user =
+        document.getElementById("loginId")
+            .value.trim();
+
+    const password =
+        document.getElementById("loginPassword")
+            .value;
+
+    const errorBox =
+        document.getElementById("loginError");
+
+    errorBox.textContent = "";
+
+
+    if(!user || !password){
+
+        errorBox.textContent =
+            "Please enter username and password.";
+
+        return;
+
+    }
+
+
+    if(!dataReady){
+
+        const loaded =
+            await loadDataFromSupabase();
+
+        if(!loaded)
+            return;
+
+    }
+
+
+    /* HOD LOGIN */
+
+    if(loginType === "hod"){
+
+        if(
+            user === "admin" &&
+            password === "admin123"
+        ){
+
+            currentUser = {
+
+                id:"ADMIN",
+
+                name:"HOD / Admin",
+
+                role:"hod"
+
+            };
+
+            openApp();
+
+            return;
+
+        }
+
+
+        errorBox.textContent =
+            "Invalid HOD/Admin username or password.";
+
+        return;
+
+    }
+
+
+    /* FACULTY LOGIN */
+
+    const faculty =
+        facultyData.find(
+            f => f.id.toUpperCase() === user.toUpperCase()
+        );
+
+
+    if(
+        faculty &&
+        password === "faculty123"
+    ){
+
+        currentUser = {
+
+            id:faculty.id,
+
+            name:faculty.name,
+
+            role:"faculty"
+
+        };
+
+        openApp();
+
+        return;
+
+    }
+
+
+    errorBox.textContent =
+        "Invalid Faculty ID or password.";
+
+}
+
+
+/* =========================================================
+   OPEN APP
+========================================================= */
+
+function openApp(){
+
+    document
+        .getElementById("loginPage")
+        .classList.add("hidden");
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
+
+
+    if(currentUser.role === "hod"){
+
+        document
+            .getElementById("hodNav")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("facultyNav")
+            .classList.add("hidden");
+
+        document
+            .getElementById("userName")
+            .textContent =
+                "HOD / Admin";
+
+        document
+            .getElementById("userAvatar")
+            .textContent = "A";
+
+        showPage("dashboard");
+
+    }else{
+
+        document
+            .getElementById("hodNav")
+            .classList.add("hidden");
+
+        document
+            .getElementById("facultyNav")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("userName")
+            .textContent =
+                currentUser.name;
+
+        document
+            .getElementById("userAvatar")
+            .textContent =
+                currentUser.name
+                    .charAt(0)
+                    .toUpperCase();
+
+        showPage("myDashboard");
+
+    }
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logout(){
+
+    currentUser = null;
+
+    document
+        .getElementById("app")
+        .classList.add("hidden");
+
+    document
+        .getElementById("loginPage")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("loginId")
+        .value = "";
+
+    document
+        .getElementById("loginPassword")
+        .value = "";
+
+    document
+        .getElementById("loginError")
+        .textContent = "";
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(pageId, clickedElement){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.remove("active");
+
+        });
+
+
+    const page =
+        document.getElementById(pageId);
+
+    if(page)
+        page.classList.add("active");
+
+
+    document
+        .querySelectorAll(".nav-item")
+        .forEach(item => {
+
+            item.classList.remove("active");
+
+        });
+
+
+    if(clickedElement)
+        clickedElement.classList.add("active");
+
+
+    const titles = {
+
+        dashboard:"Dashboard",
+
+        faculty:"Faculty Management",
+
+        attendance:"Attendance",
+
+        work:"Work Assignment",
+
+        workload:"Workload Report",
+
+        myDashboard:"My Dashboard",
+
+        myAttendance:"My Attendance",
+
+        myWork:"My Work",
+
+        profile:"My Profile"
+
+    };
+
+
+    document
+        .getElementById("topTitle")
+        .textContent =
+            titles[pageId] || "FacultyFlow";
+
+
+    document
+        .getElementById("sidebar")
+        .classList.remove("open");
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function toggleSidebar(){
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+
+}
+
+
+/* =========================================================
+   RENDER ALL
+========================================================= */
+
+function renderAll(){
+
+    if(!dataReady)
+        return;
+
+    renderDashboard();
+
+    renderFaculty();
+
+    renderAttendance();
+
+    renderTasks();
+
+    renderWorkload();
+
+    renderFacultyDashboard();
+
+    renderMyAttendance();
+
+    renderMyWork();
+
+    renderProfile();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard(){
+
+    document
+        .getElementById("totalFaculty")
+        .textContent =
+            facultyData.length;
+
+
+    const today =
+        getToday();
+
+    const todayAttendance =
+        attendanceData[today] || {};
+
+
+    let present = 0;
+
+    let absent = 0;
+
+
+    facultyData.forEach(f => {
+
+        if(todayAttendance[f.id] === "Present")
+            present++;
+
+        if(todayAttendance[f.id] === "Absent")
+            absent++;
+
+    });
+
+
+    document
+        .getElementById("presentToday")
+        .textContent = present;
+
+
+    document
+        .getElementById("absentToday")
+        .textContent = absent;
+
+
+    const active =
+        tasks.filter(
+            t => t.status !== "Completed"
+        ).length;
+
+
+    document
+        .getElementById("activeTasks")
+        .textContent = active;
+
+
+    const box =
+        document.getElementById("dashboardTasks");
+
+
+    if(tasks.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No work assignments found.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Faculty</th>
+                    <th>Work</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${tasks.slice(-5).reverse().map(task => {
+
+                    const f =
+                        getFaculty(task.facultyId);
+
+                    return `
+
+                    <tr>
+
+                        <td>
+                            ${f ? f.name : task.facultyId}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(task.title)}
+                        </td>
+
+                        <td>
+                            ${priorityBadge(task.priority)}
+                        </td>
+
+                        <td>
+                            ${task.dueDate || "-"}
+                        </td>
+
+                        <td>
+                            ${statusBadge(task.status)}
+                        </td>
+
+                    </tr>
+
+                    `;
+
+                }).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   FACULTY MANAGEMENT
+========================================================= */
+
+function renderFaculty(){
+
+    const box =
+        document.getElementById("facultyTable");
+
+
+    if(facultyData.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No faculty found.
+                Add faculty or import CSV.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Experience</th>
+                    <th>Attendance</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${facultyData.map(f => `
+
+                    <tr>
+
+                        <td>
+                            <strong>${escapeHTML(f.id)}</strong>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(f.name)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(f.department)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(f.designation)}
+                        </td>
+
+                        <td>
+                            ${f.experience} years
+                        </td>
+
+                        <td>
+                            <span class="badge badge-blue">
+                                ${Number(f.attendance).toFixed(1)}%
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="danger-btn"
+                                onclick="deleteFaculty('${escapeAttr(f.id)}')">
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   FACULTY MODAL
+========================================================= */
+
+function openFacultyModal(){
+
+    document
+        .getElementById("facultyId")
+        .value = "";
+
+    document
+        .getElementById("facultyName")
+        .value = "";
+
+    document
+        .getElementById("facultyExperience")
+        .value = "";
+
+    document
+        .getElementById("facultyModal")
+        .classList.add("show");
+
+}
+
+
+async function addFaculty(){
+
+    const id =
+        document
+            .getElementById("facultyId")
+            .value.trim()
+            .toUpperCase();
+
+    const name =
+        document
+            .getElementById("facultyName")
+            .value.trim();
+
+    const department =
+        document
+            .getElementById("facultyDepartment")
+            .value;
+
+    const designation =
+        document
+            .getElementById("facultyDesignation")
+            .value;
+
+    const experience =
+        Number(
+            document
+                .getElementById("facultyExperience")
+                .value || 0
+        );
+
+
+    if(!id || !name){
+
+        alert("Faculty ID and Name are required.");
+
+        return;
+
+    }
+
+
+    if(
+        facultyData.some(
+            f => f.id.toUpperCase() === id
+        )
+    ){
+
+        alert("Faculty ID already exists.");
+
+        return;
+
+    }
+
+
+    showLoading();
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("faculty")
+                .insert({
+
+                    faculty_id:id,
+
+                    name:name,
+
+                    department:department,
+
+                    designation:designation,
+
+                    experience:experience,
+
+                    attendance:0
+
+                });
+
+
+        if(error)
+            throw error;
+
+
+        await loadDataFromSupabase();
+
+        closeModal("facultyModal");
+
+        alert("Faculty added successfully.");
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "Faculty could not be added.\n\n" +
+            error.message
+        );
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   DELETE FACULTY
+========================================================= */
+
+async function deleteFaculty(id){
+
+    const ok =
+        confirm(
+            "Are you sure you want to delete " +
+            id +
+            "?"
+        );
+
+
+    if(!ok)
+        return;
+
+
+    showLoading();
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("faculty")
+                .delete()
+                .eq("faculty_id",id);
+
+
+        if(error)
+            throw error;
+
+
+        await loadDataFromSupabase();
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Delete failed.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CSV IMPORT
+========================================================= */
+
+async function importFacultyData(event){
+
+    const file =
+        event.target.files[0];
+
+    if(!file)
+        return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = async function(e){
+
+        const text =
+            e.target.result;
+
+
+        const lines =
+            text.split(/\r?\n/)
+                .filter(line => line.trim());
+
+
+        if(lines.length < 2){
+
+            alert("CSV file is empty.");
+
+            return;
+
+        }
+
+
+        const headers =
+            lines[0]
+                .split(",")
+                .map(h =>
+                    h.trim().toLowerCase()
+                );
+
+
+        const existingIds =
+            new Set(
+                facultyData.map(
+                    f => f.id.toUpperCase()
+                )
+            );
+
+
+        const rows = [];
+
+
+        for(let i=1;i<lines.length;i++){
+
+            const values =
+                lines[i]
+                    .split(",")
+                    .map(v => v.trim());
+
+
+            const obj = {};
+
+
+            headers.forEach((header,index)=>{
+
+                obj[header] =
+                    values[index] || "";
+
+            });
+
+
+            const id =
+                obj.faculty_id ||
+                obj.facultyid ||
+                obj.id ||
+                "";
+
+
+            if(!id)
+                continue;
+
+
+            const upperId =
+                id.toUpperCase();
+
+
+            if(existingIds.has(upperId))
+                continue;
+
+
+            existingIds.add(upperId);
+
+
+            rows.push({
+
+                faculty_id:upperId,
+
+                name:
+                    obj.name || "Unknown",
+
+                department:
+                    obj.department || "CSE",
+
+                designation:
+                    obj.designation ||
+                    "Assistant Professor",
+
+                experience:
+                    Number(
+                        obj.experience || 0
+                    ),
+
+                attendance:
+                    Number(
+                        obj.attendance || 0
+                    )
+
+            });
+
+        }
+
+
+        if(rows.length === 0){
+
+            alert(
+                "No new faculty records found."
+            );
+
+            event.target.value = "";
+
+            return;
+
+        }
+
+
+        showLoading();
+
+
+        try{
+
+            const {error} =
+                await supabaseClient
+                    .from("faculty")
+                    .insert(rows);
+
+
+            if(error)
+                throw error;
+
+
+            await loadDataFromSupabase();
+
+            alert(
+                rows.length +
+                " faculty records imported successfully."
+            );
+
+
+        }catch(error){
+
+            console.error(error);
+
+            hideLoading();
+
+            alert(
+                "CSV import failed.\n\n" +
+                error.message
+            );
+
+        }
+
+
+        event.target.value = "";
+
+    };
+
+
+    reader.readAsText(file);
+
+}
+
+
+/* =========================================================
+   ATTENDANCE
+========================================================= */
+
+function renderAttendance(){
+
+    const dateInput =
+        document.getElementById("attendanceDate");
+
+
+    if(!dateInput)
+        return;
+
+
+    if(!dateInput.value)
+        dateInput.value = getToday();
+
+
+    const date =
+        dateInput.value;
+
+
+    const dayData =
+        attendanceData[date] || {};
+
+
+    const box =
+        document.getElementById("attendanceTable");
+
+
+    if(facultyData.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No faculty found.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Faculty ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Attendance %</th>
+                    <th>Mark Attendance</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${facultyData.map(f => {
+
+                    const status =
+                        dayData[f.id] || "";
+
+
+                    return `
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                ${escapeHTML(f.id)}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(f.name)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(f.department)}
+                        </td>
+
+                        <td>
+                            ${Number(f.attendance).toFixed(1)}%
+                        </td>
+
+                        <td>
+
+                            <div class="attendance-buttons">
+
+                                <button
+                                    class="present-btn ${status === "Present" ? "selected" : ""}"
+                                    onclick="setAttendance('${escapeAttr(f.id)}','Present')">
+                                    ✓ Present
+                                </button>
+
+                                <button
+                                    class="absent-btn ${status === "Absent" ? "selected" : ""}"
+                                    onclick="setAttendance('${escapeAttr(f.id)}','Absent')">
+                                    ✕ Absent
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    `;
+
+                }).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SET ATTENDANCE
+========================================================= */
+
+async function setAttendance(facultyId,status){
+
+    const date =
+        document
+            .getElementById("attendanceDate")
+            .value;
+
+
+    if(!date)
+        return;
+
+
+    showLoading();
+
+
+    try{
+
+        /*
+           Existing attendance for same faculty/date
+           is deleted first because the table currently
+           has no UNIQUE constraint.
+        */
+
+        const {error:deleteError} =
+            await supabaseClient
+                .from("attendance")
+                .delete()
+                .eq("faculty_id",facultyId)
+                .eq("attendance_date",date);
+
+
+        if(deleteError)
+            throw deleteError;
+
+
+        const {error:insertError} =
+            await supabaseClient
+                .from("attendance")
+                .insert({
+
+                    faculty_id:facultyId,
+
+                    attendance_date:date,
+
+                    status:status
+
+                });
+
+
+        if(insertError)
+            throw insertError;
+
+
+        if(!attendanceData[date])
+            attendanceData[date] = {};
+
+
+        attendanceData[date][facultyId] =
+            status;
+
+
+        const percentage =
+            calculateAttendance(facultyId);
+
+
+        const {error:facultyError} =
+            await supabaseClient
+                .from("faculty")
+                .update({
+
+                    attendance:
+                        Number(percentage)
+
+                })
+                .eq("faculty_id",facultyId);
+
+
+        if(facultyError)
+            throw facultyError;
+
+
+        await loadDataFromSupabase();
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Attendance update failed.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MARK ALL PRESENT
+========================================================= */
+
+async function markAllPresent(){
+
+    const date =
+        document
+            .getElementById("attendanceDate")
+            .value;
+
+
+    if(!date)
+        return;
+
+
+    if(facultyData.length === 0){
+
+        alert("No faculty found.");
+
+        return;
+
+    }
+
+
+    const ok =
+        confirm(
+            "Mark all faculty as Present for " +
+            date +
+            "?"
+        );
+
+
+    if(!ok)
+        return;
+
+
+    showLoading();
+
+
+    try{
+
+        /* Delete current date records */
+
+        const {error:deleteError} =
+            await supabaseClient
+                .from("attendance")
+                .delete()
+                .eq("attendance_date",date);
+
+
+        if(deleteError)
+            throw deleteError;
+
+
+        /* Insert all Present */
+
+        const rows =
+            facultyData.map(f => ({
+
+                faculty_id:f.id,
+
+                attendance_date:date,
+
+                status:"Present"
+
+            }));
+
+
+        const {error:insertError} =
+            await supabaseClient
+                .from("attendance")
+                .insert(rows);
+
+
+        if(insertError)
+            throw insertError;
+
+
+        /* Local state */
+
+        attendanceData[date] = {};
+
+
+        facultyData.forEach(f => {
+
+            attendanceData[date][f.id] =
+                "Present";
+
+        });
+
+
+        /* Update percentages */
+
+        for(const f of facultyData){
+
+            const percentage =
+                calculateAttendance(f.id);
+
+
+            await supabaseClient
+                .from("faculty")
+                .update({
+
+                    attendance:
+                        Number(percentage)
+
+                })
+                .eq("faculty_id",f.id);
+
+        }
+
+
+        await loadDataFromSupabase();
+
+        alert(
+            "All faculty marked Present."
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Could not mark all present.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CALCULATE ATTENDANCE
+========================================================= */
+
+function calculateAttendance(facultyId){
+
+    let total = 0;
+
+    let present = 0;
+
+
+    Object.keys(attendanceData)
+        .forEach(date => {
+
+            const status =
+                attendanceData[date][facultyId];
+
+
+            if(status){
+
+                total++;
+
+                if(status === "Present")
+                    present++;
+
+            }
+
+        });
+
+
+    if(total === 0){
+
+        const f =
+            getFaculty(facultyId);
+
+        return f
+            ? Number(f.attendance || 0)
+            : 0;
+
+    }
+
+
+    return ((present / total) * 100).toFixed(1);
+
+}
+
+
+/* =========================================================
+   WORK MODAL
+========================================================= */
+
+function openTaskModal(){
+
+    const select =
+        document.getElementById("taskFaculty");
+
+
+    select.innerHTML =
+        facultyData.map(f => `
+
+            <option value="${escapeAttr(f.id)}">
+
+                ${escapeHTML(f.id)}
+                - ${escapeHTML(f.name)}
+
+            </option>
+
+        `).join("");
+
+
+    document
+        .getElementById("taskTitle")
+        .value = "";
+
+    document
+        .getElementById("taskDueDate")
+        .value = "";
+
+    document
+        .getElementById("taskInstructions")
+        .value = "";
+
+
+    newTaskStatus = "Pending";
+
+    updateNewTaskStatusUI();
+
+
+    document
+        .getElementById("taskModal")
+        .classList.add("show");
+
+}
+
+
+/* =========================================================
+   NEW TASK STATUS
+========================================================= */
+
+function selectNewTaskStatus(status){
+
+    newTaskStatus = status;
+
+    updateNewTaskStatusUI();
+
+}
+
+
+function updateNewTaskStatusUI(){
+
+    const buttons = {
+
+        "Pending":
+            document.getElementById("newStatusPending"),
+
+        "In Progress":
+            document.getElementById("newStatusProgress"),
+
+        "Completed":
+            document.getElementById("newStatusCompleted")
+
+    };
+
+
+    Object.values(buttons)
+        .forEach(btn => {
+
+            if(btn)
+                btn.style.outline = "none";
+
+        });
+
+
+    if(buttons[newTaskStatus]){
+
+        buttons[newTaskStatus].style.outline =
+            "3px solid #c7d2fe";
+
+    }
+
+}
+
+
+/* =========================================================
+   ADD TASK
+========================================================= */
+
+async function addTask(){
+
+    const facultyId =
+        document
+            .getElementById("taskFaculty")
+            .value;
+
+    const title =
+        document
+            .getElementById("taskTitle")
+            .value.trim();
+
+    const category =
+        document
+            .getElementById("taskCategory")
+            .value;
+
+    const priority =
+        document
+            .getElementById("taskPriority")
+            .value;
+
+    const dueDate =
+        document
+            .getElementById("taskDueDate")
+            .value;
+
+    const instructions =
+        document
+            .getElementById("taskInstructions")
+            .value.trim();
+
+
+    if(!facultyId || !title || !dueDate){
+
+        alert(
+            "Faculty, Work Title and Due Date are required."
+        );
+
+        return;
+
+    }
+
+
+    showLoading();
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("work_assignments")
+                .insert({
+
+                    faculty_id:facultyId,
+
+                    title:title,
+
+                    category:category,
+
+                    priority:priority,
+
+                    due_date:dueDate,
+
+                    instructions:instructions,
+
+                    status:newTaskStatus
+
+                });
+
+
+        if(error)
+            throw error;
+
+
+        await loadDataFromSupabase();
+
+        closeModal("taskModal");
+
+        alert(
+            "Work assigned successfully."
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Work assignment failed.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TASK TABLE
+========================================================= */
+
+function renderTasks(){
+
+    const box =
+        document.getElementById("taskTable");
+
+
+    if(tasks.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No work assignments found.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Faculty</th>
+                    <th>Work</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${tasks.map(task => {
+
+                    const f =
+                        getFaculty(task.facultyId);
+
+
+                    return `
+
+                    <tr>
+
+                        <td>
+                            ${f
+                                ? escapeHTML(f.name)
+                                : escapeHTML(task.facultyId)}
+                        </td>
+
+                        <td>
+
+                            <strong>
+                                ${escapeHTML(task.title)}
+                            </strong>
+
+                            ${
+                                task.instructions
+                                ?
+                                `<br>
+                                 <small style="color:#64748b">
+                                 ${escapeHTML(task.instructions)}
+                                 </small>`
+                                :
+                                ""
+                            }
+
+                        </td>
+
+                        <td>
+                            ${escapeHTML(task.category)}
+                        </td>
+
+                        <td>
+                            ${priorityBadge(task.priority)}
+                        </td>
+
+                        <td>
+                            ${task.dueDate || "-"}
+                        </td>
+
+                        <td>
+
+                            <div class="status-buttons">
+
+                                <button
+                                    class="status-btn status-pending"
+                                    onclick="changeTaskStatus(${task.id},'Pending')">
+                                    Pending
+                                </button>
+
+                                <button
+                                    class="status-btn status-progress"
+                                    onclick="changeTaskStatus(${task.id},'In Progress')">
+                                    In Progress
+                                </button>
+
+                                <button
+                                    class="status-btn status-completed"
+                                    onclick="changeTaskStatus(${task.id},'Completed')">
+                                    Completed
+                                </button>
+
+                            </div>
+
+                            <div style="margin-top:6px">
+                                ${statusBadge(task.status)}
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    `;
+
+                }).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   CHANGE TASK STATUS
+========================================================= */
+
+async function changeTaskStatus(taskId,status){
+
+    showLoading();
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("work_assignments")
+                .update({
+
+                    status:status
+
+                })
+                .eq("id",taskId);
+
+
+        if(error)
+            throw error;
+
+
+        await loadDataFromSupabase();
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Status update failed.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+function statusBadge(status){
+
+    if(status === "Completed"){
+
+        return `
+            <span class="badge badge-green">
+                Completed
+            </span>
+        `;
+
+    }
+
+
+    if(status === "In Progress"){
+
+        return `
+            <span class="badge badge-blue">
+                In Progress
+            </span>
+        `;
+
+    }
+
+
+    return `
+        <span class="badge badge-yellow">
+            Pending
+        </span>
+    `;
+
+}
+
+
+function priorityBadge(priority){
+
+    if(priority === "High"){
+
+        return `
+            <span class="badge badge-red">
+                High
+            </span>
+        `;
+
+    }
+
+
+    if(priority === "Medium"){
+
+        return `
+            <span class="badge badge-yellow">
+                Medium
+            </span>
+        `;
+
+    }
+
+
+    return `
+        <span class="badge badge-green">
+            Low
+        </span>
+    `;
+
+}
+
+
+/* =========================================================
+   WORKLOAD REPORT
+========================================================= */
+
+function renderWorkload(){
+
+    const box =
+        document.getElementById("workloadGrid");
+
+
+    if(facultyData.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No faculty found.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML =
+        facultyData.map(f => {
+
+            const facultyTasks =
+                tasks.filter(
+                    t => t.facultyId === f.id
+                );
+
+
+            const completed =
+                facultyTasks.filter(
+                    t => t.status === "Completed"
+                ).length;
+
+
+            const total =
+                facultyTasks.length;
+
+
+            const percentage =
+                total === 0
+                    ? 0
+                    : Math.round(
+                        completed / total * 100
+                    );
+
+
+            return `
+
+            <div class="workload-card">
+
+                <h3>
+                    ${escapeHTML(f.name)}
+                </h3>
+
+                <p style="color:#64748b;margin-top:5px">
+                    ${escapeHTML(f.department)}
+                    •
+                    ${escapeHTML(f.designation)}
+                </p>
+
+                <div style="margin-top:18px">
+
+                    <strong>
+                        ${total}
+                    </strong>
+                    total task(s)
+
+                </div>
+
+                <div style="margin-top:8px">
+
+                    <strong>
+                        ${completed}
+                    </strong>
+                    completed
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        style="width:${percentage}%">
+                    </div>
+
+                </div>
+
+                <small>
+                    ${percentage}% completed
+                </small>
+
+            </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   FACULTY DASHBOARD
+========================================================= */
+
+function renderFacultyDashboard(){
+
+    if(!currentUser ||
+       currentUser.role !== "faculty")
+        return;
+
+
+    const f =
+        getFaculty(currentUser.id);
+
+
+    if(!f)
+        return;
+
+
+    const myTasks =
+        tasks.filter(
+            t => t.facultyId === currentUser.id
+        );
+
+
+    document
+        .getElementById("myAttendanceValue")
+        .textContent =
+            Number(f.attendance).toFixed(1) + "%";
+
+
+    document
+        .getElementById("myTotalTasks")
+        .textContent =
+            myTasks.length;
+
+
+    document
+        .getElementById("myPendingTasks")
+        .textContent =
+            myTasks.filter(
+                t => t.status === "Pending"
+            ).length;
+
+
+    document
+        .getElementById("myCompletedTasks")
+        .textContent =
+            myTasks.filter(
+                t => t.status === "Completed"
+            ).length;
+
+}
+
+
+/* =========================================================
+   MY ATTENDANCE
+========================================================= */
+
+function renderMyAttendance(){
+
+    if(!currentUser ||
+       currentUser.role !== "faculty")
+        return;
+
+
+    const box =
+        document.getElementById("myAttendanceTable");
+
+
+    const rows = [];
+
+
+    Object.keys(attendanceData)
+        .sort()
+        .reverse()
+        .forEach(date => {
+
+            const status =
+                attendanceData[date][currentUser.id];
+
+
+            if(status){
+
+                rows.push({
+
+                    date:date,
+
+                    status:status
+
+                });
+
+            }
+
+        });
+
+
+    if(rows.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No attendance records found.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${rows.map(row => `
+
+                    <tr>
+
+                        <td>
+                            ${row.date}
+                        </td>
+
+                        <td>
+
+                            ${
+                                row.status === "Present"
+
+                                ?
+
+                                `<span class="badge badge-green">
+                                    Present
+                                 </span>`
+
+                                :
+
+                                `<span class="badge badge-red">
+                                    Absent
+                                 </span>`
+                            }
+
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   MY WORK
+========================================================= */
+
+function renderMyWork(){
+
+    if(!currentUser ||
+       currentUser.role !== "faculty")
+        return;
+
+
+    const box =
+        document.getElementById("myWorkTable");
+
+
+    const myTasks =
+        tasks.filter(
+            t => t.facultyId === currentUser.id
+        );
+
+
+    if(myTasks.length === 0){
+
+        box.innerHTML =
+            `<div class="empty">
+                No work assigned.
+             </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Work</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${myTasks.map(task => `
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+                                ${escapeHTML(task.title)}
+                            </strong>
+
+                            ${
+                                task.instructions
+                                ?
+                                `<br>
+                                <small style="color:#64748b">
+                                ${escapeHTML(task.instructions)}
+                                </small>`
+                                :
+                                ""
+                            }
+
+                        </td>
+
+                        <td>
+                            ${escapeHTML(task.category)}
+                        </td>
+
+                        <td>
+                            ${priorityBadge(task.priority)}
+                        </td>
+
+                        <td>
+                            ${task.dueDate || "-"}
+                        </td>
+
+                        <td>
+
+                            <div class="status-buttons">
+
+                                <button
+                                    class="status-btn status-pending"
+                                    onclick="changeMyTaskStatus(${task.id},'Pending')">
+                                    Pending
+                                </button>
+
+                                <button
+                                    class="status-btn status-progress"
+                                    onclick="changeMyTaskStatus(${task.id},'In Progress')">
+                                    In Progress
+                                </button>
+
+                                <button
+                                    class="status-btn status-completed"
+                                    onclick="changeMyTaskStatus(${task.id},'Completed')">
+                                    Completed
+                                </button>
+
+                            </div>
+
+                            <div style="margin-top:6px">
+                                ${statusBadge(task.status)}
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   FACULTY CHANGE OWN TASK STATUS
+========================================================= */
+
+async function changeMyTaskStatus(taskId,status){
+
+    if(!currentUser)
+        return;
+
+
+    showLoading();
+
+
+    try{
+
+        const {error} =
+            await supabaseClient
+                .from("work_assignments")
+                .update({
+
+                    status:status
+
+                })
+                .eq("id",taskId)
+                .eq(
+                    "faculty_id",
+                    currentUser.id
+                );
+
+
+        if(error)
+            throw error;
+
+
+        await loadDataFromSupabase();
+
+    }catch(error){
+
+        console.error(error);
+
+        hideLoading();
+
+        alert(
+            "Status update failed.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function renderProfile(){
+
+    if(!currentUser ||
+       currentUser.role !== "faculty")
+        return;
+
+
+    const f =
+        getFaculty(currentUser.id);
+
+
+    if(!f)
+        return;
+
+
+    const box =
+        document.getElementById("profileBox");
+
+
+    box.innerHTML = `
+
+        <div class="profile-row">
+
+            <strong>Faculty ID</strong>
+
+            <span>
+                ${escapeHTML(f.id)}
+            </span>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <strong>Name</strong>
+
+            <span>
+                ${escapeHTML(f.name)}
+            </span>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <strong>Department</strong>
+
+            <span>
+                ${escapeHTML(f.department)}
+            </span>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <strong>Designation</strong>
+
+            <span>
+                ${escapeHTML(f.designation)}
+            </span>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <strong>Experience</strong>
+
+            <span>
+                ${f.experience} years
+            </span>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <strong>Attendance</strong>
+
+            <span>
+                <span class="badge badge-blue">
+                    ${Number(f.attendance).toFixed(1)}%
+                </span>
+            </span>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   GET FACULTY
+========================================================= */
+
+function getFaculty(id){
+
+    return facultyData.find(
+        f => f.id === id
+    );
+
+}
+
+
+/* =========================================================
+   MODAL CLOSE
+========================================================= */
+
+function closeModal(id){
+
+    document
+        .getElementById(id)
+        .classList.remove("show");
+
+}
+
+
+/* =========================================================
+   HTML SAFETY
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function escapeAttr(value){
+
+    return String(value ?? "")
+        .replace(/\\/g,"\\\\")
+        .replace(/'/g,"\\'");
+
+}
+
+
+/* =========================================================
+   INITIAL START
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async function(){
+
+    const attendanceDate =
+        document.getElementById(
+            "attendanceDate"
+        );
+
+    if(attendanceDate)
+        attendanceDate.value = getToday();
+
+
+    /*
+       Load everything directly from Supabase.
+       No localStorage is used.
+    */
+
+    await loadDataFromSupabase();
+
+});
+
+</script>
+
+</body>
+</html>
